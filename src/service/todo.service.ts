@@ -29,10 +29,11 @@ const updateTodo = async (id: string, data: todo) => {
       throw Error("Not found todo following id");
     }
 
-    await db.todo.update({
+    const result = await db.todo.update({
       where: { todoId: id },
       data,
     });
+    return result
   } catch (error) {
     throw error;
   }

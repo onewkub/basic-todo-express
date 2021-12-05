@@ -13,7 +13,7 @@ router.post("/todos", todoController.createTodo);
 
 router.put("/todos/:id", todoController.updateTodo);
 
-router.get("/todos/:id/marked", todoController.markTodo);
+router.put("/todos/:id/marked", todoController.markTodo);
 
 router.delete("/todos/:id", todoController.deleteTodo);
 
