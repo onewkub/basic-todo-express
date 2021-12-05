@@ -1,48 +1,73 @@
-import mockData, { todoModel } from "../mock.data";
+import { todo } from ".prisma/client";
+import db from "../utils/db";
 
-let todoList = mockData;
-
-const getAllTodo = () => {
-  return todoList;
-};
-
-const createTodo = (data: todoModel) => {
-  const result = {
-    id: todoList.length+1,
-    title: data.title,
-    marked: false,
-  };
-  todoList.push(result);
-
-  return result
-};
-
-const updateTodo = (id: number, data: string) => {
-  const existing = todoList.some((i) => i.id === id);
-  if (!existing) {
-    throw Error("Not found todo following id");
+const getAllTodo = async () => {
+  try {
+    const result = await db.todo.findMany();
+    return result;
+  } catch (error) {
+    throw error;
   }
-
-  todoList = todoList.map((i) => {
-    if (i.id === id) return { ...i, title: data };
-    return i;
-  });
 };
 
-const markedTodo = (id: number) => {
-  const existing = todoList.some((i) => i.id === id);
-  if (!existing) {
-    throw Error("Not found todo following id");
+const createTodo = async (data: todo) => {
+  try {
+    const result = await db.todo.create({
+      data: data,
+    });
+
+    return result;
+  } catch (error) {
+    throw error;
   }
-
-  todoList = todoList.map((i) => {
-    if (i.id === id) return { ...i, marked: true };
-    return i;
-  });
 };
 
-const deleteTodo = (id: number) => {
-  todoList = todoList.filter((i) => i.id !== id);
+const updateTodo = async (id: string, data: todo) => {
+  try {
+    const existing = await db.todo.findFirst({ where: { todoId: id } });
+    if (!existing) {
+      throw Error("Not found todo following id");
+    }
+
+    await db.todo.update({
+      where: { todoId: id },
+      data,
+    });
+  } catch (error) {
+    throw error;
+  }
+};
+
+const markedTodo = async (id: string) => {
+  try {
+    const existing = await db.todo.findFirst({ where: { todoId: id } });
+    if (!existing) {
+      throw Error("Not found todo following id");
+    }
+    await db.todo.update({
+      where: { todoId: id },
+      data: {
+        ...existing,
+        marked: true,
+      },
+    });
+  } catch (error) {
+    throw error;
+  }
+};
+
+const deleteTodo = async (id: string) => {
+  try {
+    const existing = await db.todo.findFirst({ where: { todoId: id } });
+    if (!existing) {
+      throw Error("Not found todo following id");
+    }
+    await db.todo.delete({
+      where: { todoId: id },
+    });
+  } catch (error) {
+    throw error;
+  }
 };
 
 const todoService = {

@@ -1,37 +1,65 @@
+import { todo } from ".prisma/client";
 import { Request, Response } from "express";
-import { todoModel } from "../mock.data";
 import todoService from "../service/todo.service";
 
-const getAllTodo = (req: Request, res: Response) => {
-  const result = todoService.getAllTodo();
-  res.send(result);
+const getAllTodo = async (_: Request, res: Response) => {
+  try {
+    const result = await todoService.getAllTodo();
+    res.send(result);
+  } catch (error) {
+    res.status(500).send(error);
+  }
 };
 
-const createTodo = (req: Request, res: Response) => {
-  const payload = req.body as todoModel;
+const createTodo = async (req: Request, res: Response) => {
+  try {
+    const payload = req.body as todo;
 
-  const result = todoService.createTodo(payload);
-  res.send(result);
+    const result = await todoService.createTodo(payload);
+    res.send(result);
+  } catch (error) {
+    res.status(500).send(error);
+  }
 };
 
-const updateTodo = (req: Request, res: Response) => {
-  const payload = req.body as todoModel;
-  const id = Number(req.params.id);
-  const result = todoService.updateTodo(id, payload.title);
-  res.send("OK");
+const updateTodo = async (req: Request, res: Response) => {
+  try {
+    const payload = req.body as todo;
+    const id = req.params.id;
+    const result = await todoService.updateTodo(id, payload);
+    res.send(result);
+  } catch (error) {
+    res.status(500).send(error);
+  }
 };
 
-const markTodo = (req: Request, res: Response) => {
-  const id = Number(req.params.id);
+const markTodo = async (req: Request, res: Response) => {
+  try {
+    const id = req.params.id;
 
-  todoService.markedTodo(id);
-  res.send("OK");
+    await todoService.markedTodo(id);
+    res.send({
+      status: 200,
+      message: `todo id:${id} has been already marked.`,
+    });
+  } catch (e) {
+    const error = e as Error;
+    res.status(400).send({ status: 400, message: error.message });
+  }
 };
 
-const deleteTodo = (req: Request, res: Response) => {
-  const id = Number(req.params.id);
-  todoService.deleteTodo(id);
-  res.send("OK");
+const deleteTodo = async (req: Request, res: Response) => {
+  try {
+    const id = req.params.id;
+    await todoService.deleteTodo(id);
+    res.send({
+      status: 200,
+      message: `todo id:${id} has been already removed.`,
+    });
+  } catch (e) {
+    const error = e as Error;
+    res.status(400).send({ status: 400, message: error.message });
+  }
 };
 
 const todoController = {
@@ -39,7 +67,7 @@ const todoController = {
   createTodo,
   updateTodo,
   markTodo,
-  deleteTodo
+  deleteTodo,
 };
 
 export default todoController;
