@@ -3,7 +3,8 @@
 ## Setup
 ```
 npm install
-npx prisma migrate deploy 
+npx prisma migrate dev
+// i think it should be deploy but it's not migrate database.
 ```
 
 ## Start
